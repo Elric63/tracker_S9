@@ -4,3 +4,4 @@ Membres :
 Alexandre Rousseau
 Elric Montorier
 Nicolas Stevenin
+Rémi MACH
