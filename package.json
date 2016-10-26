@@ -1,0 +1,33 @@
+{
+  "name": "tracker_s9",
+  "version": "1.0.0",
+  "description": "Implementation du tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "trackertest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Elric63/tracker_S9.git"
+  },
+  "author": "Elric Montorier, Alexandre Rousseau, Nicolas Stevenin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Elric63/tracker_S9/issues"
+  },
+  "homepage": "https://github.com/Elric63/tracker_S9#readme",
+  "dependencies": {
+    "bower": "^1.7.9",
+    "express": "^4.14.0",
+    "q": "^1.4.1",
+    "redis": "^2.6.2",
+    "socket.io": "^1.5.0",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "fakeredis": "^1.0.3",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.2",
+    "socket.io-client": "^1.5.0"
+  }
+}
