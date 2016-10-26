@@ -2,3 +2,4 @@
 Mise en place et implémentation du tracker
 Membres :
 Alexandre Rousseau
+Elric Montorier
