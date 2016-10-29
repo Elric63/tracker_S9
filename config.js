@@ -1,5 +1,7 @@
 /* Config file to configure javascript object with the values of our environment variables. */
 
+require('./env.js'); //personal file to set local environment variables
+
 var config = {
     REDISURL: getEnv('REDISURL'),
     PORT: getEnv('PORT')
