@@ -11,5 +11,14 @@ function init_sockets(server, cli){
 
         //rest of our code here
         //TODO : add a new peer and disconnect "socket.on('add'...)"
+
+        /* add function : when  a new peer join a room */
+
+        socket.on('add', function(id_peer, ip_address, room, ack){
+            peer = new Peer(id_peer, ip_address, room, socket.id);
+
+            // use setPeerId and setPeerIP
+
+        })
     })
 }
