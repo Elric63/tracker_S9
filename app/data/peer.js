@@ -15,6 +15,9 @@ module.exports = function Peer(socket_id, ip_address, file_id, port){
     this.file_id = file_id;
 };
 
+module.exports.setPeerId = setPeerId;
+module.exports.setPeerIP = setPeerIP;
+
 /**
  * function to set a peer in the redis db
  * using "multi" function of redis with a transaction block.
