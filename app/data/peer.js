@@ -8,8 +8,8 @@
 // 'q' is a Promise library (allow an asynchronous execution of our function)
 var q = require('q');
 
-module.exports = function Peer(id_peer, ip_address, room, socket_id){
-    this.id_peer = id_peer;
+module.exports = function Peer(socket_id, ip_address, room, port){
+    this.port = port;
     this.ip_address = ip_address;
     this.socket_id = socket_id;
     this.room = room;
@@ -21,11 +21,11 @@ module.exports = function Peer(id_peer, ip_address, room, socket_id){
  *
  */
 
-function setPeerId(id_peer, room, expire, client){
+function setPeerId(socket_id, room, expire, client){
     return q.Promise(function(resolve, reject, notify){
         client.multi()
-            .setex(room+' :peers: ' + id_peer, expire, id_peer)
-            .sadd(room + ' :peers', room + ' :peers : ' + id_peer)
+            .setex(room+' :peers: ' + socket_id, expire, socket_id)
+            .sadd(room + ' :peers', room + ' :peers : ' + socket_id)
             .expire(room+' :peers', expire)
             .exec(function(err){
                 if(err === null){
