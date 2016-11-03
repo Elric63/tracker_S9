@@ -7,7 +7,11 @@ function init_sockets(server, cli){
     var listener = socketio.listen(server);
 
     listener.on('connection', function(sock){
-        console.log(sock.id);
+        console.log('New peer connected with id :' + sock.id + 'and address IP :' + sock.handshake.address);
+        sock.emit('message', 'Peer connecté');
+        sock.on('message', function(lemessage){
+           console.log(lemessage);
+        });
     });
 
     var peers = listener.of('/peers').on('connection', function(socket){
@@ -19,8 +23,8 @@ function init_sockets(server, cli){
 
         /* add function : when  a new peer join a room */
 
-        socket.on('add', function(id_peer, ip_address, room, ack){
-            peer = new Peer(id_peer, ip_address, room, socket.id);
+        socket.on('add', function(id_peer, ip_address, file_id, ack){
+            peer = new Peer(socket.id, socket.handshake.address, file_id, port);
 
             // use setPeerId and setPeerIP
 
