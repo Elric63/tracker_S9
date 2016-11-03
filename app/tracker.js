@@ -4,19 +4,19 @@ var express = require('express');
 
 
 var tracker = express();
-tracker.set('port', config.PORT);
+tracker.set('port', config.PORT_TRACKER);
 
 /* Setting the tracker server */
 
 console.log(tracker.get('port'));
 
-/*
+
 var trackServer = tracker.listen(tracker.get('port'), function(){
     console.log('The Express tracker server is currently listening on port :' + trackServer.address().port
 
     );
 });
-*/
+
 
 client.on('connect', function () {
     console.log('connected');

@@ -4,7 +4,8 @@ require('./env.js'); //personal file to set local environment variables
 
 var config = {
     REDISURL: getEnv('REDISURL'),
-    PORT: getEnv('PORT')
+    PORT: getEnv('PORT'),
+    PORT_TRACKER: getEnv('PORT_TRACKER')
 };
 
 function getEnv(variable){
