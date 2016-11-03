@@ -2,11 +2,6 @@ var client = require('../app/redis');
 var config = require('../config');
 var express = require('express');
 var socket = require('../app/data/socket');
-var server = require('http').Server(express);
-var socketio = require('socket.io')(server);
-
-server.listen(6377);
-
 
 var tracker = express();
 tracker.set('port', config.PORT_TRACKER);
@@ -23,10 +18,6 @@ var trackServer = tracker.listen(tracker.get('port'), function(){
 });
 
 
-socketio.on('connection', function(sockettest){
-    console.log(sockettest.id);
-});
-
 client.on('connect', function () {
     console.log('connected');
 
@@ -35,6 +26,8 @@ client.on('connect', function () {
         console.log(reply);
     });
 });
+
+socket(trackServer, client);
 
 
 
