@@ -14,7 +14,7 @@ function init_sockets(server, cli){
         });
     });
 
-    var peers = listener.of('/peers').on('connection', function(socket){
+    var peers = listener.of('/peers').on('connection', function(socket) {
         var peer;
 
 
@@ -23,11 +23,19 @@ function init_sockets(server, cli){
 
         /* add function : when  a new peer join a room */
 
-        socket.on('add', function(id_peer, ip_address, file_id, ack){
+        socket.on('add', function (id_peer, ip_address, file_id, ack) {
             peer = new Peer(socket.id, socket.handshake.address, file_id, port);
 
-            // use setPeerId and setPeerIP
+            Peer.setPeerId(socket.id, file_id, expire * 2, cli)
+                .done(function () {
+                    socket.join(file_id);
+                    ack();
+                }, function (err) {
+                    serverError(err, 'Something went wrong when adding your user!');
+                });
+        });
 
-        })
-    })
-}
+        // use setPeerId and setPeerIP
+
+    });
+};

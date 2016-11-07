@@ -4,7 +4,9 @@
   "description": "Implementation du tracker",
   "main": "app/tracker.js",
   "scripts": {
-    "test": "trackertest"
+    "start": "gulp run",
+    "test": "./node_modules/.bin/mocha test",
+    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- test/*.js"
   },
   "repository": {
     "type": "git",
