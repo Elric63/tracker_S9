@@ -1,0 +1,52 @@
+<html>
+<head>
+    <title> Ceci est un test </title>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<script>
+    var age = prompt("quel age as tu?");
+    if (age == 1) {
+        alert("vous avez " + age + " an");
+    } else {
+        alert("vous avez " + age + " ans");
+    }
+
+    var a = prompt("Donnes moi un chiffre");
+    var b = 0;
+
+
+    function sum(a) {
+        // Boucle for
+        for (var tmp = 1; tmp <= a; tmp++) {
+            b += tmp;
+        }
+        alert("Somme de 0 au chiffre donné avec la boucle for est : " + b);
+    }
+
+    sum(a);
+
+    // Boucle while
+    /* var c=0;
+     var d=0;
+     while(c <= a) {
+     d+=c;
+     c++;
+     }
+     alert("Somme de 0 au chiffre donné avec la boucle while est : " + d);
+     */
+
+    // Structure d'une condition
+    /*var message = "coucou";
+     if(message == "coucou"){
+     alert('Le message vaut coucou');
+     }else{
+     alert('Le message n\'est pas coucou');
+     }*/
+</script>
+
+
+</body>
+
+</html>
