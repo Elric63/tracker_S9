@@ -19,7 +19,7 @@ function init_sockets(server, cli){
 
 
         //rest of our code here
-        //TODO : add a new peer and disconnect "socket.on('add'...)"
+        //TODO : disconnect peer "socket.on('remove'...)", and get peer IP "socket.on('get'...)
 
         /* add function : when  a new peer join a room */
 

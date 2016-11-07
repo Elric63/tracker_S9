@@ -1,5 +1,9 @@
 /**
- * TODO : Test setPeerId and setPeerIP
+ *
+ * DATABASE Controller
+ *
+ *
+ * TODO : getPeerIP and remove
  *
  * File that define the peer user going to the tracker
  */
