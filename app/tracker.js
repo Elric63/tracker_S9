@@ -2,6 +2,8 @@ var client = require('../app/redis');
 var config = require('../config');
 var express = require('express');
 var socket = require('../app/data/socket');
+var io = require('socket.io-client');
+
 
 var tracker = express();
 tracker.set('port', config.PORT_TRACKER);
@@ -28,6 +30,9 @@ client.on('connect', function () {
 });
 
 socket(trackServer, client);
+
+var yolo = io.connect('http://127.0.0.1:6378');
+
 
 
 
