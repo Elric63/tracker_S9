@@ -1,0 +1,11 @@
+{
+  "name": "Mon_chat",
+  "version": "0.1.0",
+  "author": "Elric Montorier",
+  "description": "Chat en temps réel",
+  "dependencies": {
+    "socket.io": "~1.2.1",
+    "express": "~3.3.4",
+    "ent": "~0.1.0"
+  }
+}
