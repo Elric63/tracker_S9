@@ -22,13 +22,17 @@ io.sockets.on('connection', function (socket) {
 
 // Le serveur envoie un message au client à la connection
 io.sockets.on('connection', function (socket) {
+    socket.on('new_client', function (pseudo) {
+        socket.pseudo = pseudo;
+
     socket.emit("message", "Vous êtes bien connecté");
-    socket.broadcast.emit('message', 'Un nouveau client vient de se connecter');
+        socket.broadcast.emit('message', pseudo + ' vient de se connecter');
+    });
 
 
     // Quand le serveur reçoit un signal de type "message" du client
     socket.on('message', function (message) {
-        console.log("Message du client : " + message);
+        console.log(socket.pseudo + " : " + message);
     });
 });
 
