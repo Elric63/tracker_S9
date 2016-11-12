@@ -45,7 +45,23 @@ function init_sockets(server, cli){
             }
             peer = null;
         });
-        // use setPeerId and setPeerIP
+
+
+        // Function to get Peer IP adress from database
+        socket.on('getPeerIp', function () {
+            if (peer !== undefined) {
+                var file_id = peer.file_id;
+                Peer.getPeerIp(peer.file_id, cli).done(function (getIp) {
+                    getIp.forEach(function (peerIp) {
+                        socket.emit('peerIp', peerIp)
+                    });
+                }, function (err) {
+                    serverError(err, 'Something went wrong when disconnecting');
+                })
+            } else {
+                serverError('Peer is not connected', 'Something went wrong when disconnecting')
+            }
+        });
 
     });
 };
