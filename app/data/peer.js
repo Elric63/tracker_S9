@@ -12,14 +12,15 @@
 // 'q' is a Promise library (allow an asynchronous execution of our function)
 var q = require('q');
 
-module.exports = function Peer(socket_id, ip_address, file_id, port){
-    this.port = port;
-    this.ip_address = ip_address;
+module.exports = function Peer(socket_id, file_id, ip_address){
+    //this.port = port;
     this.socket_id = socket_id;
     this.file_id = file_id;
+    this.ip_address = ip_address;
 };
 
 module.exports.setPeerId = setPeerId;
+
 module.exports.setPeerIP = setPeerIP;
 
 /**
@@ -27,22 +28,20 @@ module.exports.setPeerIP = setPeerIP;
  * using "multi" function of redis with a transaction block.
  *
  */
-
 function setPeerId(socket_id, file_id, expire, client){
     return q.Promise(function(resolve, reject, notify){
         client.multi()
-            .setex(file_id+' :peers: ' + socket_id, expire, socket_id)
-            .sadd(file_id + ' :peers', file_id + ' :peers : ' + socket_id)
-            .expire(file_id+' :peers', expire)
+            .setex(file_id+':peers:' + socket_id, expire, socket_id)
+            .sadd(file_id+':peers', file_id+':peers:' + socket_id)
+            .expire(file_id+':peers', expire)
             .exec(function(err){
                 if(err === null){
                     resolve();
-                } else {
+                }else{
                     reject(err);
                 }
             })
     });
-
 };
 
 /**
@@ -53,20 +52,19 @@ function setPeerId(socket_id, file_id, expire, client){
  *
  */
 
-
-function setPeerIP(id_peer, file_id, ip_address, expire, client){
-    return q.Promise(function(resolve, reject, notify){
+function setPeerIP(socket_id, file_id, ip_address, expire, client) {
+    return q.Promise(function (resolve, reject, notify) {
         client.multi()
-            .setex(file_id+' :peers: ' + id_peer + ' :ipaddress', expire, ip_address)
-            .sadd(file_id + ' :ipaddresses', file_id + ' :peers : ' + id_peer)
-            .expire(file_id+' :ipaddresses', expire)
-            .exec(function(err){
-                if(err === null){
+            .setex(file_id + ':peers:' + socket_id + ':ipaddress', expire, ip_address)
+            .sadd(file_id + ':ipaddresses', file_id + ':peers:' + socket_id)
+            .expire(file_id + ':ipaddresses', expire)
+            .exec(function (err) {
+                if (err === null) {
                     resolve();
                 } else {
                     reject(err);
                 }
-            })
+            });
     });
-
 };
+

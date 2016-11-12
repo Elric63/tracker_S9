@@ -12,6 +12,16 @@ describe('Test Peers in Redis', function () {
         client.flushdb();
     });
 
+    it('setPeerId should set the id socket of a peer', function(done){
+        var user2 = fctRedis.setPeerId('socketId', 'fileId', 7200, client);
+        user2.done(function(){
+            client.get('fileId:peers:socketId', function(e, d){
+                assert.equal(d, 'socketId');
+                done();
+            });
+        });
+    });
+
 
     it('setPeerId should set the id socket of the peer', function(done){
         var user = fctRedis.setPeerId('idSocket', 'idFile', 7200, client);
@@ -23,13 +33,15 @@ describe('Test Peers in Redis', function () {
         });
     });
 
-
-    it('setPeerIP should set IP of a peer', function(done){
-        var user = fctRedis.setPeerIP('idSocket', 'idFile','192.168.1.3', 7200, client);
-        user.done(function(){
-            client.get('idFile:peers:idSocket:192.168.1.3', function(e, d){
+    it('should set ipaddress of the peer', function(done){
+        var ipaddress = fctRedis.setPeerIP('socketId', 'fileId', '192.168.1.3', 7200, client);
+        ipaddress.done(function(){
+            client.get('fileId:peers:socketId:ipaddress', function(e, d){
                 assert.equal(d, '192.168.1.3');
-                done();
+                client.scard('fileId:ipaddresses', function(e, d){
+                    assert.equal(d, '1');
+                    done();
+                });
             });
         });
     });
