@@ -1,5 +1,6 @@
 var socketio = require('socket.io');
 var Peer = require('./peer');
+var  expire = 7200;
 
 module.exports = init_sockets;
 
@@ -23,16 +24,33 @@ function init_sockets(server, cli){
 
         /* add function : when  a new peer join a room */
 
-        socket.on('add', function (id_peer, ip_address, file_id, ack) {
-            peer = new Peer(socket.id, socket.handshake.address, file_id, port);
+        var id_peer = socket.id,
+            ip_address = socket.handshake.address,
+            file_id = 'file1';
 
-            Peer.setPeerId(socket.id, file_id, expire * 2, cli)
+        socket.on('add', function (id_peer, ip_address, file_id, ack) {
+            peer = new Peer(id_peer, file_id, ip_address);
+
+            Peer.setPeerId(id_peer, file_id, expire * 2, cli)
                 .done(function () {
                     socket.join(file_id);
                     ack();
                 }, function (err) {
                     serverError(err, 'Something went wrong when adding your user!');
                 });
+        });
+
+        socket.on('addIpAddress', function (ipaddress) {
+            if(peer !== undefined){
+                Peer.setPeerIP(peer.socket_id, peer.file_id, peer.ip_address, expire, cli)
+                    .done(function(){
+                        listener.of('/peers').in(peer.file_id).emit('ipaddress', {socket_id: peer.socket_id, ip_address: peer.ip_address});
+                    }, function(err){
+                        serverError(err, 'Something went wrong when adding peer ip address!');
+                    });
+            }else{
+                serverError('Peer is not logged in', 'Something went wrong when adding ip address!');
+            }
         });
 
         // Disconnecting useless peers
@@ -45,7 +63,6 @@ function init_sockets(server, cli){
             }
             peer = null;
         });
-
 
         // Function to get Peer IP adress from database
         socket.on('getPeerIp', function () {

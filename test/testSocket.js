@@ -18,7 +18,7 @@ describe('Socket.io Test', function() {
     var ioClient,
         ioClient2,
         client = fakeRedis.createClient('test'),
-        server = http.createServer().listen(8000);
+        server = http.createServer().listen(0);
 
     socketio(server, client);
 
@@ -28,8 +28,8 @@ describe('Socket.io Test', function() {
         //all tests require a user created
         ioClient.on('connect', function () {
             ioClient2.on('connect', function () {
-                ioClient.emit('add', 'idSocket1','ipaddress1', 'File1', function () {
-                    ioClient2.emit('add', 'idSocket2','ipaddress2', 'File1', function () {
+                ioClient.emit('add', 'idSocket1','ipaddress1', 'file1', function () {
+                    ioClient2.emit('add', 'idSocket2','ipaddress2', 'file1', function () {
                         done();
                     });
                 });
@@ -42,6 +42,28 @@ describe('Socket.io Test', function() {
         client.flushdb();
         ioClient.disconnect();
         ioClient2.disconnect();
+    });
+
+
+    it('should add a peer with his id', function(done) {
+        //the peer was created in beforeEach
+        client.multi()
+            .get('file1:peers:idSocket1')
+            .exec(function (err, results) {
+                assert.strictEqual(results[0], 'idSocket1');
+                done();
+            });
+
+    });
+
+
+    it('should add an ipaddress', function(done){
+        ioClient.on('ipaddress', function(ipaddress){
+            assert.strictEqual(ipaddress.socket_id, 'idSocket1');
+            assert.strictEqual(ipaddress.ip_address, 'ipaddress1');
+            done();
+        });
+        ioClient.emit('addIpAddress', 'ipaddress1');
     });
 
 

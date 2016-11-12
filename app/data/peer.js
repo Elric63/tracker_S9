@@ -20,7 +20,6 @@ module.exports = function Peer(socket_id, file_id, ip_address){
 };
 
 module.exports.setPeerId = setPeerId;
-
 module.exports.setPeerIP = setPeerIP;
 
 /**
