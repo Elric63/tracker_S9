@@ -35,6 +35,16 @@ function init_sockets(server, cli){
                 });
         });
 
+        // Disconnecting useless peers
+        socket.on('disconnect', function () {
+            if (peer !== undefined) {
+                socket.leave(peer.file_id);
+                Peer.removePeer(peer.id_peer, peer.file_id, cli).done(null, function (err) {
+                    serverError(err, 'Something went wrong when leaving');
+                });
+            }
+            peer = null;
+        });
         // use setPeerId and setPeerIP
 
     });
