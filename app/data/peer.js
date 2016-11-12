@@ -1,9 +1,13 @@
 /**
+ <<<<<<< Updated upstream
  *
  * DATABASE Controller
  *
  *
  * TODO : getPeerIP and remove
+ =======
+ * TODO : Test stPeerId and getPeerIP
+ >>>>>>> Stashed changes
  *
  * File that define the peer user going to the tracker
  */
@@ -20,9 +24,9 @@ module.exports = function Peer(socket_id, file_id, ip_address){
 };
 
 module.exports.setPeerId = setPeerId;
-
 module.exports.setPeerIP = setPeerIP;
-
+module.exports.getPeerIP = getPeerIP;
+module.exports.removePeer = removePeer;
 /**
  * function to set a peer in the redis db
  * using "multi" function of redis with a transaction block.
@@ -68,3 +72,37 @@ function setPeerIP(socket_id, file_id, ip_address, expire, client) {
     });
 };
 
+//<<<<<<< Updated upstream
+//=======
+
+// recuperer les données de redis : get
+function getPeerIP(ip_address, client) {
+    return q.Promise(function (resolve, reject, notify) {
+        client.get(ip_address, function (err, socket_id) {
+            if (err)
+                reject(err);
+            else(socket_id === null)
+        })
+
+    });
+    client.get(ip_address + ':ipaddress', function (err, ip_address) {
+        if (err)
+            reject(err);
+        if (ip_address === null)
+            reject('ip address doesn t exist');
+        resolve({socket_id: socket_id, fs: JSON.parse(ip_address)});
+    })
+};
+
+
+// suppression des donnees de redis
+function removePeer(socket_id, file_id, ip_address, client) {
+    return q.Promise(function (resolve, reject, notify) {
+        client.srem(file_id + ':peers:' + file_id + ':ipaddress' + socket_id + ip_address, function (err) {
+            if (err)
+                reject(err);
+            resolve();
+        });
+    });
+};
+//>>>>>>> Stashed changes
