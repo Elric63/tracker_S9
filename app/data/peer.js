@@ -31,6 +31,7 @@ module.exports.setPeerIP = setPeerIP;
 function setPeerId(socket_id, file_id, expire, client){
     return q.Promise(function(resolve, reject, notify){
         client.multi()
+
             .setex(file_id+' :peers: ' + socket_id, expire, socket_id)
             .sadd(file_id + ' :peers', file_id + ' :peers : ' + socket_id)
             .expire(file_id+' :peers', expire)
