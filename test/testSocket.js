@@ -72,7 +72,7 @@ describe('Socket.io Test', function() {
         client.multi()
             .get('file1:peer:idSocket1')
             .exec(function (err, results) {
-                assert.strictEqual(results[0], 'idSocket2' || null);
+                assert.strictEqual(results[0], null);
                 done();
             });
     });
