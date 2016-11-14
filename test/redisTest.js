@@ -66,5 +66,27 @@ describe('Test Peers in Redis', function () {
         });
     });
 
+
+    it('should return ip addresses with getAllIP', function(done){
+        var empty = fctRedis.getAllIP('fileId', client);
+        empty.done(function(ipaddresses){
+            assert.equal(ipaddresses.length, 0);
+        });
+
+        //set data
+        client.sadd('fileId:ipaddresses', 'fileId:peers:socketId');
+        client.set('fileId:peers:socketId', 'socketId');
+        client.set('fileId:peers:socketId:ipaddress', JSON.stringify({ip_address: '192.168.1.3'}));
+
+        var oneIP = fctRedis.getAllIP('fileId', client);
+        oneIP.done(function(ipaddresses){
+            assert.equal(ipaddresses.length, 1);
+            var ipaddr = ipaddresses[0];
+            assert.equal(ipaddr.socket_id, 'socketId');
+            assert.equal(ipaddr.fs.ip_address, '192.168.1.3');
+            done();
+        });
+    });
+
 });
 

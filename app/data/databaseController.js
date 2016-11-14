@@ -23,6 +23,7 @@ module.exports = function Peer(socket_id, file_id, ip_address){
 module.exports.setPeerId = setPeerId;
 module.exports.setPeerIP = setPeerIP;
 module.exports.getPeerIP = getPeerIP;
+module.exports.getAllIP = getAllIP;
 module.exports.removePeer = removePeer;
 /**
  * function to set a peer in the redis db
@@ -91,11 +92,11 @@ function getPeerIP(ipaddress, client) {
 
 function getAllIP(file_id, client) {
     return q.Promise(function (resolve, reject, notify) {
-        client.smembers(file_id + 'IPaddresses', function (err, address) {
+        client.smembers(file_id + 'ipaddresses', function (err, ipaddr) {
             if (err)
                 reject(err);
-            if (IPaddresses.length > 0) {
-                var length = addresses.length;
+            if (ipaddr.length > 0) {
+                var length = ipaddr.length;
                 var returnIPAddresses = [];
                 IPaddresses.forEach(function (ip_address) {
                     getPeerIP(ip_address, client).done(function (ip_address) {
@@ -114,9 +115,9 @@ function getAllIP(file_id, client) {
     });
 };
 // suppression des donnees de redis
-function removePeer(socket_id, file_id, ip_address, client) {
+function removePeer(socket_id, file_id, client) {
     return q.Promise(function (resolve, reject, notify) {
-        client.srem(file_id + ':peers:' + file_id + ':ipaddress' + socket_id + ip_address, function (err) {
+        client.srem(file_id + ':peers', file_id + ':peers:' + socket_id, function (err) {
             if (err)
                 reject(err);
             resolve();
