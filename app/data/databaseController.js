@@ -87,7 +87,30 @@ function getPeerIP(ip_address, client) {
     });
 };
 
-
+function getAllIP(file_id, client) {
+    return q.Promise(function (resolve, reject, notify) {
+        client.smembers(file_id + 'IPaddresses', function (err, address) {
+            if (err)
+                reject(err);
+            if (IPaddresses.length > 0) {
+                var length = addresses.length;
+                var returnIPAddresses = [];
+                IPaddresses.forEach(function (ip_address) {
+                    getPeerIP(ip_address, client).done(function (ip_address) {
+                        returnIPAddresses.push(ip_address);
+                        length--;
+                        if (length === 0)
+                            resolve(returnIPAddresses);
+                    }, function (err) {
+                        reject(err);
+                    });
+                });
+            } else {
+                resolve([]);
+            }
+        });
+    });
+};
 // suppression des donnees de redis
 function removePeer(socket_id, file_id, ip_address, client) {
     return q.Promise(function (resolve, reject, notify) {
