@@ -19,6 +19,12 @@ function init_sockets(server, cli){
         var peer;
 
 
+        function serverError(err, message){
+            console.log(err);
+            socket.emit('serverError', {message: message});
+        };
+
+
         //rest of our code here
         //TODO : disconnect peer "socket.on('remove'...)", and get peer IP "socket.on('get'...)
 
@@ -46,10 +52,10 @@ function init_sockets(server, cli){
                     .done(function(){
                         listener.of('/peers').in(peer.file_id).emit('ipaddress', {socket_id: peer.socket_id, ip_address: peer.ip_address});
                     }, function(err){
-                        //serverError(err, 'Something went wrong when adding peer ip address!');
+                        serverError(err, 'Something went wrong when adding peer ip address!');
                     });
             }else{
-                //serverError('Peer is not logged in', 'Something went wrong when adding ip address!');
+                serverError('Peer is not logged in', 'Something went wrong when adding ip address!');
             }
         });
 
@@ -58,7 +64,7 @@ function init_sockets(server, cli){
             if (peer !== undefined) {
                 socket.leave(peer.file_id);
                 Peer.removePeer(peer.id_peer, peer.file_id, cli).done(null, function (err) {
-                    //serverError(err, 'Something went wrong when leaving');
+                    serverError(err, 'Something went wrong when leaving');
                 });
             }
             peer = null;
@@ -68,15 +74,15 @@ function init_sockets(server, cli){
         socket.on('getPeerIp', function () {
             if (peer !== undefined) {
                 var file_id = peer.file_id;
-                Peer.getPeerIP(peer.file_id, cli).done(function (getIp) {
+                Peer.getAllIP(peer.file_id, cli).done(function (getIp) {
                     getIp.forEach(function (peerIp) {
                         socket.emit('peerIp', peerIp)
                     });
                 }, function (err) {
-                    //serverError(err, 'Something went wrong when disconnecting');
+                    serverError(err, 'Something went wrong when disconnecting');
                 })
             } else {
-                //serverError('Peer is not connected', 'Something went wrong when disconnecting')
+                serverError('Peer is not connected', 'Something went wrong when disconnecting')
             }
         });
 

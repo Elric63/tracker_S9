@@ -1,7 +1,7 @@
 var client = require('../app/redis');
 var config = require('../config');
 var express = require('express');
-var socket = require('data/signalingCoontroller');
+var socket = require('../app/data/signalingController');
 var io = require('socket.io-client');
 
 

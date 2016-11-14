@@ -70,19 +70,21 @@ function setPeerIP(socket_id, file_id, ip_address, expire, client) {
 };
 
 // recuperer les données de redis : get
-function getPeerIP(ip_address, client) {
+function getPeerIP(ipaddress, client) {
     return q.Promise(function (resolve, reject, notify) {
-        client.get(ip_address, function (err, socket_id) {
+        client.get(ipaddress, function (err, socketId) {
             if (err)
                 reject(err);
-            else(socket_id === null)
-        });
-        client.get(ip_address + ':ipaddress', function (err, ip_address) {
+            if(socketId === null)
+                reject('SocketId is null');
+
+        client.get(ipaddress + ':ipaddress', function (err, ip_address) {
             if (err)
                 reject(err);
             if (ip_address === null)
                 reject('ip address does not exist');
-            resolve({socket_id: socket_id, fs: JSON.parse(ip_address)});
+            resolve({socket_id: socketId, fs: JSON.parse(ip_address)});
+        })
         });
     });
 };

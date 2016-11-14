@@ -13,8 +13,8 @@ describe('Test Peers in Redis', function () {
     });
 
     it('setPeerId should set the id socket of a peer', function(done){
-        var user2 = fctRedis.setPeerId('socketId', 'fileId', 7200, client);
-        user2.done(function(){
+        var peer = fctRedis.setPeerId('socketId', 'fileId', 7200, client);
+        peer.done(function(){
             client.get('fileId:peers:socketId', function(e, d){
                 assert.equal(d, 'socketId');
                 done();
@@ -50,18 +50,18 @@ describe('Test Peers in Redis', function () {
     it('should add ip addresses for getPeerIP', function(done){
         var noSocketId = fctRedis.getPeerIP('fileId:peers:socketId', client);
         noSocketId.done(null, function(err){
-            assert.equal(err, 'ip address does not exist');
+            assert.equal(err, 'SocketId is null');
         });
 
         //setup the data
         client.set('fileId:peers:socketId', 'socketId');
-        client.set('fileId:peers:socketId:ipaddress', '192.168.1.3');
+        client.set('fileId:peers:socketId:ipaddress', JSON.stringify({ip_address : '192.168.1.3'}));
 
         //make sure the function gets the correct keys
         var peerIP = fctRedis.getPeerIP('fileId:peers:socketId', client);
         peerIP.done(function(ipaddress){
             assert.equal(ipaddress.socket_id, 'socketId');
-            assert.equal(ipaddress.ip_address, '192.168.1.3');
+            assert.equal(ipaddress.fs.ip_address, '192.168.1.3');
             done();
         });
     });
