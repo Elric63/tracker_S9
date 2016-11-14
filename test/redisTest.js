@@ -1,6 +1,6 @@
 var assert = require('assert'),
     client = require('fakeredis').createClient('test'),
-    fctRedis = require('../app/data/peer');
+    fctRedis = require('../app/data/databaseController');
 
 describe('Test Peers in Redis', function () {
 

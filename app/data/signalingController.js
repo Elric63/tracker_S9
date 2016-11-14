@@ -1,5 +1,5 @@
 var socketio = require('socket.io');
-var Peer = require('./peer');
+var Peer = require('./databaseController');
 var  expire = 7200;
 
 module.exports = init_sockets;

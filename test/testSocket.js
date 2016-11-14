@@ -5,7 +5,7 @@
 var assert = require('assert'),
     fakeRedis = require('fakeredis'),
     http = require('http'),
-    socketio = require('../app/data/socket'),
+    socketio = require('../app/data/signalingController'),
     io = require('socket.io-client');
 
 

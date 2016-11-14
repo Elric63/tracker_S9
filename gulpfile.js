@@ -10,7 +10,7 @@ gulp.task('build', ['build-client']);
 
 
 gulp.task('build-client', function () {
-    return gulp.src(['app/tracker.js'])
+    return gulp.src(['app/hostController.js'])
         .pipe(gulp.dest('bin/'));
 });
 
@@ -18,7 +18,7 @@ gulp.task('build-client', function () {
 gulp.task('run', ['build'], function () {
     nodemon({
         delay: 10,
-        script: './tracker.js',
+        script: './hostController.js',
         cwd: "./bin/",
         ext: 'html js css'
     })
