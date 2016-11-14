@@ -1,13 +1,10 @@
 /**
- <<<<<<< Updated upstream
  *
  * DATABASE Controller
  *
  *
- * TODO : getPeerIP and remove
  =======
- * TODO : Test stPeerId and getPeerIP
- >>>>>>> Stashed changes
+ * TODO : Test getPeerIP and remove
  *
  * File that define the peer user going to the tracker
  */
@@ -72,9 +69,6 @@ function setPeerIP(socket_id, file_id, ip_address, expire, client) {
     });
 };
 
-//<<<<<<< Updated upstream
-//=======
-
 // recuperer les données de redis : get
 function getPeerIP(ip_address, client) {
     return q.Promise(function (resolve, reject, notify) {
@@ -82,16 +76,15 @@ function getPeerIP(ip_address, client) {
             if (err)
                 reject(err);
             else(socket_id === null)
-        })
-
+        });
+        client.get(ip_address + ':ipaddress', function (err, ip_address) {
+            if (err)
+                reject(err);
+            if (ip_address === null)
+                reject('ip address does not exist');
+            resolve({socket_id: socket_id, fs: JSON.parse(ip_address)});
+        });
     });
-    client.get(ip_address + ':ipaddress', function (err, ip_address) {
-        if (err)
-            reject(err);
-        if (ip_address === null)
-            reject('ip address doesn t exist');
-        resolve({socket_id: socket_id, fs: JSON.parse(ip_address)});
-    })
 };
 
 
@@ -105,4 +98,3 @@ function removePeer(socket_id, file_id, ip_address, client) {
         });
     });
 };
-//>>>>>>> Stashed changes

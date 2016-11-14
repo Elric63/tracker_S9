@@ -46,5 +46,25 @@ describe('Test Peers in Redis', function () {
         });
     });
 
+
+    it('should add ip addresses for getPeerIP', function(done){
+        var noSocketId = fctRedis.getPeerIP('fileId:peers:socketId', client);
+        noSocketId.done(null, function(err){
+            assert.equal(err, 'ip address does not exist');
+        });
+
+        //setup the data
+        client.set('fileId:peers:socketId', 'socketId');
+        client.set('fileId:peers:socketId:ipaddress', '192.168.1.3');
+
+        //make sure the function gets the correct keys
+        var peerIP = fctRedis.getPeerIP('fileId:peers:socketId', client);
+        peerIP.done(function(ipaddress){
+            assert.equal(ipaddress.socket_id, 'socketId');
+            assert.equal(ipaddress.ip_address, '192.168.1.3');
+            done();
+        });
+    });
+
 });
 
