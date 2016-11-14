@@ -66,6 +66,17 @@ describe('Socket.io Test', function() {
         ioClient.emit('addIpAddress', 'ipaddress1');
     });
 
+    // TODO : testing 'disconnect' and 'getPeerIp'
+
+    it('should remove a peer with this id', function (done) {
+        client.multi()
+            .get('file1:peer:idSocket1')
+            .exec(function (err, results) {
+                assert.strictEqual(results[0], 'idSocket2' || null);
+                done();
+            });
+    });
+
 
 
 });

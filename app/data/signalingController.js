@@ -64,7 +64,7 @@ function init_sockets(server, cli){
             peer = null;
         });
 
-        // Function to get Peer IP adress from database
+        // Function to get Peer IP address from database
         socket.on('getPeerIp', function () {
             if (peer !== undefined) {
                 var file_id = peer.file_id;
