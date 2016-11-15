@@ -98,8 +98,8 @@ function getAllIP(file_id, client) {
             if (ipaddr.length > 0) {
                 var length = ipaddr.length;
                 var returnIPAddresses = [];
-                IPaddresses.forEach(function (ip_address) {
-                    getPeerIP(ip_address, client).done(function (ip_address) {
+                ipaddr.forEach(function (ipaddresses) {
+                    getPeerIP(ipaddresses, client).done(function (ip_address) {
                         returnIPAddresses.push(ip_address);
                         length--;
                         if (length === 0)

@@ -41,6 +41,7 @@ function init_sockets(server, cli){
                 .done(function () {
                     socket.join(file_id);
                     ack();
+                    console.log('new user added successfully');
                 }, function (err) {
                     serverError(err, 'Something went wrong when adding your user!');
                 });
@@ -51,6 +52,7 @@ function init_sockets(server, cli){
                 Peer.setPeerIP(peer.socket_id, peer.file_id, peer.ip_address, expire, cli)
                     .done(function(){
                         listener.of('/peers').in(peer.file_id).emit('ipaddress', {socket_id: peer.socket_id, ip_address: peer.ip_address});
+                        console.log('new peer IP added successfully');
                     }, function(err){
                         serverError(err, 'Something went wrong when adding peer ip address!');
                     });

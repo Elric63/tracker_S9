@@ -31,9 +31,10 @@ client.on('connect', function () {
 
 socket(trackServer, client);
 
-var yolo = io.connect('http://127.0.0.1:6378');
-
-
+//var yolo = io.connect('http://127.0.0.1:6378/peers');
+//yolo.emit('add');
+var yolo = io('http://127.0.0.1:6378/peers');
+//yolo.emit('add', yolo.id, 'coucou', 'file1');
 
 
 
