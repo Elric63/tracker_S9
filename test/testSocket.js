@@ -53,7 +53,6 @@ describe('Socket.io Test', function() {
                 assert.strictEqual(results[0], 'idSocket1');
                 done();
             });
-
     });
 
 

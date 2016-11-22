@@ -4,22 +4,24 @@ var  expire = 7200;
 
 module.exports = init_sockets;
 
-function init_sockets(server, cli){
+function init_sockets(server, cli) {
     var listener = socketio.listen(server);
+    var clientMap = {};
 
-    listener.on('connection', function(sock){
+    /*listener.on('connection', function (sock) {
         console.log('New peer connected with id :' + sock.id + 'and address IP :' + sock.handshake.address);
         sock.emit('message', 'Peer connecté');
-        sock.on('message', function(lemessage){
-           console.log(lemessage);
+        sock.on('message', function (lemessage) {
+            console.log(lemessage);
         });
-    });
+    });*/
 
-    var peers = listener.of('/peers').on('connection', function(socket) {
+    var peers = listener.of('/peers').on('connection', function (socket) {
         var peer;
+        console.log('New peer connected with id :' + socket.id + 'and address IP :' + socket.handshake.address);
 
 
-        function serverError(err, message){
+        function serverError(err, message) {
             console.log(err);
             socket.emit('serverError', {message: message});
         };
@@ -30,36 +32,43 @@ function init_sockets(server, cli){
 
         /* add function : when  a new peer join a room */
 
-        var id_peer = socket.id,
-            ip_address = socket.handshake.address,
-            file_id = 'file1';
+        socket.on('signalingHandshake', function (data) {
 
-        socket.on('add', function (id_peer, ip_address, file_id, ack) {
-            peer = new Peer(id_peer, file_id, ip_address);
 
-            Peer.setPeerId(id_peer, file_id, expire * 2, cli)
-                .done(function () {
-                    socket.join(file_id);
-                    ack();
-                    console.log('new user added successfully');
-                }, function (err) {
-                    serverError(err, 'Something went wrong when adding your user!');
-                });
+            if(data === "v1.0"){
+                socket.emit('signalingHandshakeAnswer', 'OK');
+            } else {
+                socket.emit('signalingHandshakeAnswer', 'DENY');
+            }
+            console.log(data);
+
         });
 
-        socket.on('addIpAddress', function (ipaddress) {
-            if(peer !== undefined){
-                Peer.setPeerIP(peer.socket_id, peer.file_id, peer.ip_address, expire, cli)
-                    .done(function(){
-                        listener.of('/peers').in(peer.file_id).emit('ipaddress', {socket_id: peer.socket_id, ip_address: peer.ip_address});
-                        console.log('new peer IP added successfully');
-                    }, function(err){
-                        serverError(err, 'Something went wrong when adding peer ip address!');
-                    });
-            }else{
-                serverError('Peer is not logged in', 'Something went wrong when adding ip address!');
+
+        socket.on('signalingRequestFile', function (data) {
+            peer = new Peer(socket.id, data);
+
+            Peer.setPeerId(JSON.stringify(socket.id), data, cli)
+                .done(function () {
+                    socket.join(data);
+
+                }, function (err) {
+                    serverError(err, 'Something went wrong when adding your peer!');
+                });
+
+            if (peer !== undefined) {
+                //var file_id = peer.file_id;
+                console.log(socket.id);
+                Peer.getPeerId(data, cli).done(function (getId) {
+                    socket.emit('signalingRequestFileAnswer', peerId);
+                }, function (err) {
+                    serverError(err, 'Something went wrong when disconnecting');
+                })
+            } else {
+                serverError('Peer is not connected', 'Something went wrong when disconnecting')
             }
         });
+
 
         // Disconnecting useless peers
         socket.on('disconnect', function () {
@@ -70,23 +79,21 @@ function init_sockets(server, cli){
                 });
             }
             peer = null;
+            console.log("peer removed successfully");
         });
 
-        // Function to get Peer IP address from database
-        socket.on('getPeerIp', function () {
-            if (peer !== undefined) {
-                var file_id = peer.file_id;
-                Peer.getAllIP(peer.file_id, cli).done(function (getIp) {
-                    getIp.forEach(function (peerIp) {
-                        socket.emit('peerIp', peerIp)
-                    });
-                }, function (err) {
-                    serverError(err, 'Something went wrong when disconnecting');
-                })
-            } else {
-                serverError('Peer is not connected', 'Something went wrong when disconnecting')
+
+        socket.on('rtcHandshake', function (inputStr) {
+            var input = JSON.parse(inputStr);
+            if (input.inst == 'init') {
+                console.log("Initialisation done for " + thisIDCounter);
+                clientMap[input.id] = socket;
+            } else if (input.inst == 'send') {
+                console.log("Send done for " + thisIDCounter);
+                clientMap[input.peerId].send(JSON.stringify(input.message));
             }
         });
-
     });
+
+
 };

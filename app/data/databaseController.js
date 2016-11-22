@@ -13,29 +13,26 @@
 // 'q' is a Promise library (allow an asynchronous execution of our function)
 var q = require('q');
 
-module.exports = function Peer(socket_id, file_id, ip_address){
+module.exports = function Peer(socket_id, file_id){
     //this.port = port;
     this.socket_id = socket_id;
     this.file_id = file_id;
-    this.ip_address = ip_address;
+    //this.ip_address = ip_address;
 };
 
 module.exports.setPeerId = setPeerId;
-module.exports.setPeerIP = setPeerIP;
-module.exports.getPeerIP = getPeerIP;
-module.exports.getAllIP = getAllIP;
+module.exports.getPeerId = getPeerId;
 module.exports.removePeer = removePeer;
 /**
  * function to set a peer in the redis db
  * using "multi" function of redis with a transaction block.
  *
  */
-function setPeerId(socket_id, file_id, expire, client){
+function setPeerId(socket_id, file_id, client){
     return q.Promise(function(resolve, reject, notify){
         client.multi()
-            .setex(file_id+':peers:' + socket_id, expire, socket_id)
-            .sadd(file_id+':peers', file_id+':peers:' + socket_id)
-            .expire(file_id+':peers', expire)
+            .set(file_id,'peers')
+            .sadd(file_id+':peers', socket_id)
             .exec(function(err){
                 if(err === null){
                     resolve();
@@ -54,73 +51,44 @@ function setPeerId(socket_id, file_id, expire, client){
  *
  */
 
-function setPeerIP(socket_id, file_id, ip_address, expire, client) {
-    return q.Promise(function (resolve, reject, notify) {
-        client.multi()
-            .setex(file_id + ':peers:' + socket_id + ':ipaddress', expire, ip_address)
-            .sadd(file_id + ':ipaddresses', file_id + ':peers:' + socket_id)
-            .expire(file_id + ':ipaddresses', expire)
-            .exec(function (err) {
-                if (err === null) {
-                    resolve();
-                } else {
-                    reject(err);
-                }
-            });
-    });
-};
+
 
 // recuperer les données de redis : get
-function getPeerIP(ipaddress, client) {
+function getPeerId(key, client) {
     return q.Promise(function (resolve, reject, notify) {
-        client.get(ipaddress, function (err, socketId) {
-            if (err)
-                reject(err);
-            if(socketId === null)
-                reject('SocketId is null');
-
-        client.get(ipaddress + ':ipaddress', function (err, ip_address) {
-            if (err)
-                reject(err);
-            if (ip_address === null)
-                reject('ip address does not exist');
-            resolve({socket_id: socketId, fs: JSON.parse(ip_address)});
-        })
-        });
-    });
-};
-
-function getAllIP(file_id, client) {
-    return q.Promise(function (resolve, reject, notify) {
-        client.smembers(file_id + 'ipaddresses', function (err, ipaddr) {
-            if (err)
-                reject(err);
-            if (ipaddr.length > 0) {
-                var length = ipaddr.length;
-                var returnIPAddresses = [];
-                ipaddr.forEach(function (ipaddresses) {
-                    getPeerIP(ipaddresses, client).done(function (ip_address) {
-                        returnIPAddresses.push(ip_address);
+        client.multi()
+            .scard(key+':peers')
+            .smembers(key+'peers', function (err, peerIds) {
+                if (err)
+                    reject(err);
+                if (peerIds.length() > 0) {
+                    var length = peerIds.length();
+                    console.log(length);
+                    var returnPeerId = [];
+                    peerIds.forEach(function(reply, index){
+                        returnPeerId.push(reply.toString());
+                        console.log("Peer " + index + ": " + reply.toString());
                         length--;
-                        if (length === 0)
-                            resolve(returnIPAddresses);
-                    }, function (err) {
-                        reject(err);
-                    });
-                });
-            } else {
-                resolve([]);
-            }
-        });
+                        if(length === 0){
+                            resolve(returnPeerId);
+                        }
+                    })
+                } else {
+                    resolve([]);
+                }
+            })
     });
 };
+
+
 // suppression des donnees de redis
 function removePeer(socket_id, file_id, client) {
     return q.Promise(function (resolve, reject, notify) {
-        client.srem(file_id + ':peers', file_id + ':peers:' + socket_id, function (err) {
+        client.srem(file_id + ':peers',socket_id, function (err) {
             if (err)
                 reject(err);
             resolve();
         });
+        console.log("peer removed successfully");
     });
 };
