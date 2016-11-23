@@ -8,17 +8,10 @@ function init_sockets(server, cli) {
     var listener = socketio.listen(server);
     var clientMap = {};
 
-    /*listener.on('connection', function (sock) {
-        console.log('New peer connected with id :' + sock.id + 'and address IP :' + sock.handshake.address);
-        sock.emit('message', 'Peer connecté');
-        sock.on('message', function (lemessage) {
-            console.log(lemessage);
-        });
-    });*/
-
     var peers = listener.of('/peers').on('connection', function (socket) {
         var peer;
-        console.log('New peer connected with id :' + socket.id + 'and address IP :' + socket.handshake.address);
+
+        console.log('New peer connected with id :' + socket.id + ' and address IP :' + socket.handshake.address);
 
 
         function serverError(err, message) {
@@ -28,9 +21,10 @@ function init_sockets(server, cli) {
 
 
         //rest of our code here
-        //TODO : disconnect peer "socket.on('remove'...)", and get peer IP "socket.on('get'...)
 
-        /* add function : when  a new peer join a room */
+        /**
+         *  Signaling handshake, Check the version used
+         */
 
         socket.on('signalingHandshake', function (data) {
 
@@ -44,11 +38,18 @@ function init_sockets(server, cli) {
 
         });
 
+        /**
+         *
+         * signaling request file to send a list of peers to the connected peer
+         *
+         */
 
         socket.on('signalingRequestFile', function (data) {
-            peer = new Peer(socket.id, data);
+            peer = new Peer(socket.id, data, socket);
 
-            Peer.setPeerId(JSON.stringify(socket.id), data, cli)
+            console.log(data);
+
+            Peer.setPeerId(socket.id, data, cli)
                 .done(function () {
                     socket.join(data);
 
@@ -56,25 +57,51 @@ function init_sockets(server, cli) {
                     serverError(err, 'Something went wrong when adding your peer!');
                 });
 
-            if (peer !== undefined) {
-                //var file_id = peer.file_id;
-                console.log(socket.id);
-                Peer.getPeerId(data, cli).done(function (getId) {
-                    socket.emit('signalingRequestFileAnswer', peerId);
+            clientMap[peer.socket_id] = socket;
+
+            if (peer.socket_id !== "undefined") {
+
+                Peer.getPeerIds(data, peer.socket_id, cli).done(function (getId) {
+
+                    var perso_sock = peer.socket_id;
+                    var answer = {'peers_id':getId, 'your_id':perso_sock};
+
+                    console.log(answer);
+
+                    socket.emit('signalingRequestFileAnswer', answer);
+
                 }, function (err) {
                     serverError(err, 'Something went wrong when disconnecting');
                 })
             } else {
-                serverError('Peer is not connected', 'Something went wrong when disconnecting')
+                serverError(err, 'Something went wrong when the list of peers')
+            }
+        });
+
+        socket.on('rtcHandshake', function(idPeerToConnect){
+            var file = peer.file_id;
+            console.log(idPeerToConnect);
+            console.log(file);
+            if(file !== 'undefined'){
+                Peer.getPeer(file, idPeerToConnect, cli).done(function(idPeer){
+                    console.log(idPeer);
+                    clientMap[idPeer].emit('rtcHandshakeAnswer' ,JSON.stringify(peer.socket_id));
+
+                })
+
+            } else {
+                serverError(err, 'Something went wrong when getting the peer requested')
             }
         });
 
 
+
+
         // Disconnecting useless peers
         socket.on('disconnect', function () {
-            if (peer !== undefined) {
+            if (peer.socket_id !== "undefined") {
                 socket.leave(peer.file_id);
-                Peer.removePeer(peer.id_peer, peer.file_id, cli).done(null, function (err) {
+                Peer.removePeer(peer.socket_id, peer.file_id, cli).done(null, function (err) {
                     serverError(err, 'Something went wrong when leaving');
                 });
             }
@@ -82,18 +109,16 @@ function init_sockets(server, cli) {
             console.log("peer removed successfully");
         });
 
-
+/*
         socket.on('rtcHandshake', function (inputStr) {
             var input = JSON.parse(inputStr);
-            if (input.inst == 'init') {
-                console.log("Initialisation done for " + thisIDCounter);
-                clientMap[input.id] = socket;
-            } else if (input.inst == 'send') {
-                console.log("Send done for " + thisIDCounter);
-                clientMap[input.peerId].send(JSON.stringify(input.message));
+            if (input.inst == 'send') {
+
+                clientMap[input.peerId].emit('rtcHandshakeAnswer' ,JSON.stringify(input.message));
             }
-        });
+        });*/
     });
+
 
 
 };
