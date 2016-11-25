@@ -11,6 +11,7 @@
 
 
 // 'q' is a Promise library (allow an asynchronous execution of our function)
+
 var q = require('q');
 
 module.exports = function Peer(socket_id, file_id, sock){
@@ -127,12 +128,12 @@ function getPeer(file, id, client){
  */
 
 function removePeer(socket_id, file_id, client) {
-    console.log("yolo");
+
     return q.Promise(function (resolve, reject, notify) {
         client.srem(file_id + ':peers',socket_id, function (err) {
             if (err)
                 reject(err);
-            console.log("peer removed successfully");
+            console.log("peer removed successfully from Redis");
             resolve();
         });
 

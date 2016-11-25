@@ -20,24 +20,14 @@ var trackServer = tracker.listen(tracker.get('port'), function(){
 });
 
 
-client.on('connect', function () {
-    console.log('connected');
-
-
-    client.set('monhash', 'Mon Message', function (err, reply) {
-        console.log(reply);
-    });
-});
-
 socket(trackServer, client);
 
-//var yolo = io.connect('http://127.0.0.1:6378/peers');
-//yolo.emit('add');
+/*
 var yolo = io('http://127.0.0.1:6378/peers');
 yolo.emit('signalingHandshakeAnswer', 'v1.0');
 yolo.emit('signalingRequestFile', 'iuM7Jp24Jtw');
 yolo.emit('requestId', '/peers#lb5l1J4-TNnpuVtKAAAA');
 yolo.emit('disconnect');
-
+*/
 
 

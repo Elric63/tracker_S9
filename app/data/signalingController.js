@@ -67,7 +67,7 @@ function init_sockets(server, cli) {
                     var answer = {'peers_id':getId, 'your_id':perso_sock};
 
                     console.log(answer);
-
+                    //console.log(clientMap);
                     socket.emit('signalingRequestFileAnswer', answer);
 
                 }, function (err) {
@@ -85,15 +85,15 @@ function init_sockets(server, cli) {
             if(file !== 'undefined'){
                 Peer.getPeer(file, idPeerToConnect, cli).done(function(idPeer){
                     console.log(idPeer);
-                    clientMap[idPeer].emit('rtcHandshakeAnswer' ,JSON.stringify(peer.socket_id));
+                    clientMap[idPeer].emit('rtcConnectionRequest' ,JSON.stringify(peer.socket_id));
+                    socket.emit('rtcHandshakeAnswer', 'OK');
 
                 })
 
             } else {
-                serverError(err, 'Something went wrong when getting the peer requested')
+                serverError(err, 'KO')
             }
         });
-
 
 
 
@@ -105,18 +105,11 @@ function init_sockets(server, cli) {
                     serverError(err, 'Something went wrong when leaving');
                 });
             }
+            //clientMap.delete(peer.socket_id);
             peer = null;
-            console.log("peer removed successfully");
+            console.log("database Controller told me that the peer was removed successfully");
         });
 
-/*
-        socket.on('rtcHandshake', function (inputStr) {
-            var input = JSON.parse(inputStr);
-            if (input.inst == 'send') {
-
-                clientMap[input.peerId].emit('rtcHandshakeAnswer' ,JSON.stringify(input.message));
-            }
-        });*/
     });
 
 
